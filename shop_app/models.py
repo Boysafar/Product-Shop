@@ -3,17 +3,17 @@ from django.utils import timezone
 
 
 class Product(models.Model):
-    title = models.CharField("Title", max_length=250)
-    price = models.IntegerField()
-    qty = models.IntegerField(default=0)
-    company = models.ForeignKey('shop_app.Company', on_delete=models.CASCADE)
+    title = models.CharField("Mahsulot nomi", max_length=250)
+    price = models.IntegerField("Narxi",)
+    qty = models.IntegerField("Mahsulot soni",default=0)
+    company = models.ForeignKey('shop_app.Company', verbose_name='Kompaniya', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.title} {self.company}"
 
     class Meta:
-        verbose_name_plural = "Products"
-        verbose_name = "product"
+        verbose_name_plural = "Mahsulotlar"
+        verbose_name = "mahsulot"
 
 
 class Company(models.Model):
@@ -21,27 +21,45 @@ class Company(models.Model):
     phone = models.CharField("Company phone", max_length=50)
     address = models.CharField("Company address", max_length=250)
 
+    class Meta:
+        verbose_name_plural = "Kompaniyalar"
+        verbose_name = "Kompaniya"
+
     def __str__(self):
         return self.title
 
     def products_type(self):
         return self.product_set.count()
 
+    products_type.short_description = "Mahsulot turi"
+
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
+
+    class Meta:
+        verbose_name_plural = "Xaridorlar"
 
     def __str__(self):
         return self.name
 
 
 class Sale(models.Model):
-    customer = models.ForeignKey('shop_app.Customer', on_delete=models.CASCADE)
-    product = models.ForeignKey('shop_app.Product', on_delete=models.CASCADE)
-    company = models.ForeignKey('shop_app.Company', on_delete=models.CASCADE)
-    quantity_sold = models.IntegerField()
-    sale_date = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey('shop_app.Customer', verbose_name='Xaridor', on_delete=models.CASCADE)
+    product = models.ForeignKey('shop_app.Product', verbose_name='Mahsulot', on_delete=models.CASCADE)
+    company = models.ForeignKey('shop_app.Company', verbose_name='Kompaniya' ,on_delete=models.CASCADE)
+    quantity_sold = models.IntegerField(verbose_name='Sotilgan soni')
+    sale_date = models.DateTimeField(auto_now_add=True, verbose_name='Sotilgan vaqti')
+
+    class Meta:
+        verbose_name_plural = "Savdolar"
+        verbose_name = "Savdo"
+
+    def total_amount(self):
+        return self.product.price * self.quantity_sold
+
+    total_amount.short_description = "Umumiy narxi"
 
     def save(self, *args, **kwargs):
         if self.product.company != self.company:

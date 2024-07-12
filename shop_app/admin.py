@@ -33,12 +33,12 @@ class CompanyAdmin(admin.ModelAdmin):
         total_qty = sum(product.qty for product in products)
         return total_qty
 
-    get_total_qty.short_description = "Products quantity"
+    get_total_qty.short_description = "Mahsulot soni"
 
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'company', 'product', 'quantity_sold', 'sale_date')
+    list_display = ('customer', 'company', 'product', 'quantity_sold', 'total_amount', 'sale_date')
 
     def has_add_permission(self, request):
         return True
