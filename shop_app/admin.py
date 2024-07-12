@@ -39,6 +39,7 @@ class CompanyAdmin(admin.ModelAdmin):
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
     list_display = ('customer', 'company', 'product', 'quantity_sold', 'total_amount', 'sale_date')
+    # fields = ('customer', 'product', 'quantity_sold')
 
     def has_add_permission(self, request):
         return True

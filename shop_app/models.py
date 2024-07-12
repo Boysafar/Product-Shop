@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -7,6 +8,12 @@ class Product(models.Model):
     price = models.IntegerField("Narxi",)
     qty = models.IntegerField("Mahsulot soni",default=0)
     company = models.ForeignKey('shop_app.Company', verbose_name='Kompaniya', on_delete=models.CASCADE)
+
+    def clean(self):
+        if self.qty < 0:
+            raise ValidationError("Manfiy son kiritsh mumkin emas")
+        if self.price < 0:
+            raise ValidationError("Manfiy son kiritsh mumkin emas")
 
     def __str__(self):
         return f"{self.title} {self.company}"
@@ -61,9 +68,14 @@ class Sale(models.Model):
 
     total_amount.short_description = "Umumiy narxi"
 
+    def clean(self):
+        if self.quantity_sold < 0:
+            raise ValidationError('Sotilgan soni manfiy bo\'lmasligi kerak.')
+
     def save(self, *args, **kwargs):
+        self.clean()
         if self.product.company != self.company:
-            raise ValueError('Selected product does not belong to the selected company.')
+            raise ValidationError('Selected product does not belong to the selected company.')
 
         if self.product.qty >= self.quantity_sold:
             self.product.qty -= self.quantity_sold
